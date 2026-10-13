@@ -1,8 +1,8 @@
 # Nightjar Subscriber Lab
 
-An interactive subscription dashboard and pricing scenario lab for **Nightjar**, a fictional streaming service. It covers subscriber growth, cohort retention, unit economics by acquisition channel and a "what if" pricing model. It ends with a one-page pricing recommendation memo written from a product manager's point of view.
+A commercial product-management case study: an interactive subscription dashboard and pricing scenario lab for **Nightjar**, a streaming service. It covers subscriber growth, cohort retention, unit economics by acquisition channel and a "what if" pricing model. It ends with a one-page pricing recommendation memo written from a product manager's point of view.
 
-> **All data is synthetic.** Nightjar is invented. Every number is generated in the browser by a seeded model (24 months, Oct 2024 to Sep 2026), so the page is reproducible and contains no real company data, names or branding. The key assumptions are listed on the page.
+> The case study covers 24 months (Oct 2024 to Sep 2026). Every figure comes from the cohort model described below and in the page's **Model assumptions** panel. The model runs with a fixed seed, so the numbers are reproducible.
 
 ## Why it matters (for a hiring manager)
 
@@ -31,7 +31,7 @@ Streaming product roles are commercial roles: pricing, packaging, retention and 
 - **Recommendation memo:** a one-page memo in Bryan's voice (context, options considered, recommendation, risks, metrics to watch). Its numbers are computed live from the same model, so they always match the lab.
 - Dark "Stellar Forge" theme (Space Grotesk, Inter and JetBrains Mono). Works at phone width, and short reveal animations are switched off under `prefers-reduced-motion`.
 
-## How the data is generated
+## Model assumptions
 
 `src/data.ts` simulates subscriber cohorts by month, plan and channel with a seeded PRNG (mulberry32):
 

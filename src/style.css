@@ -197,7 +197,7 @@ a {
     transform: translateY(16px);
   }
 }
-.synthetic {
+.callout {
   display: flex;
   gap: 14px;
   align-items: flex-start;
@@ -207,12 +207,12 @@ a {
   border: 1px solid rgba(61, 220, 192, 0.35);
   background: rgba(61, 220, 192, 0.06);
 }
-.synthetic p {
+.callout p {
   margin: 0;
   color: var(--dust);
   font-size: 14px;
 }
-.synthetic strong {
+.callout strong {
   color: var(--starlight);
 }
 .badge {
@@ -986,7 +986,7 @@ pre {
   .memo ul.cols {
     columns: 1;
   }
-  .synthetic {
+  .callout {
     flex-direction: column;
     gap: 8px;
   }

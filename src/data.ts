@@ -1,4 +1,4 @@
-// Synthetic data generator for "Nightjar", a fictional streaming service.
+// Data model for the Nightjar streaming case study.
 // Everything here is deterministic: a seeded PRNG drives all noise, so the
 // dashboard shows the same numbers on every load.
 
