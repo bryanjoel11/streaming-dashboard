@@ -11,7 +11,10 @@ export interface Series {
   pattern?: boolean; // hatched fill (stacked bars)
 }
 
-const FONT = `font-family="Inter, system-ui, sans-serif"`;
+const FONT = `font-family="'DM Sans', system-ui, sans-serif"`;
+
+/** Skip drawing into hidden views; the router redraws when a view is shown. */
+const hidden = (el: HTMLElement) => el.getClientRects().length === 0;
 
 function niceStep(range: number, target: number): number {
   const raw = range / Math.max(1, target);
@@ -109,6 +112,7 @@ export interface LineOpts {
 }
 
 export function lineChart(root: HTMLElement, o: LineOpts) {
+  if (hidden(root)) return;
   const W = Math.max(280, root.clientWidth);
   const H = o.height ?? 260;
   const narrow = W < 520;
@@ -191,6 +195,7 @@ export interface StackOpts {
 }
 
 export function stackedBars(root: HTMLElement, o: StackOpts) {
+  if (hidden(root)) return;
   const W = Math.max(280, root.clientWidth);
   const H = o.height ?? 260;
   const m = { t: 12, r: 12, b: 26, l: 52 };
@@ -259,17 +264,18 @@ export interface HeatOpts {
   tip: (r: number, c: number, v: number) => string;
 }
 
-/** Single-hue sequential ramp (nebula), light -> dark is low -> high on a dark surface: low = dim, high = bright. */
+/** Single-hue sequential ramp on a dark surface: low = dim, high = bright. */
 export function rampColor(t: number): string {
   const tt = Math.max(0, Math.min(1, t));
-  // interpolate in OKLCH-ish by hand: from deep indigo to bright lavender
-  const a = [38, 34, 92];
-  const b = [196, 182, 255];
+  // one hue (rose): deep plum for low retention to light rose for high
+  const a = [58, 22, 44];
+  const b = [255, 176, 205];
   const c = a.map((v, i) => Math.round(v + (b[i] - v) * Math.pow(tt, 0.9)));
   return `rgb(${c[0]},${c[1]},${c[2]})`;
 }
 
 export function heatmap(root: HTMLElement, o: HeatOpts) {
+  if (hidden(root)) return;
   const W = Math.max(300, root.clientWidth);
   const narrow = W < 560;
   const m = { t: 22, r: 4, b: 4, l: narrow ? 56 : 70 };
@@ -291,7 +297,7 @@ export function heatmap(root: HTMLElement, o: HeatOpts) {
       const y0 = m.t + ch * i + 1;
       g += `<rect x="${x0}" y="${y0}" width="${cw - 2}" height="${ch - 2}" rx="3" fill="${rampColor(t)}" data-tip="${esc(o.tip(i, j, v))}" class="cell"/>`;
       if (showVals)
-        g += `<text x="${x0 + (cw - 2) / 2}" y="${y0 + ch / 2 + 3}" text-anchor="middle" class="cell-v" fill="${t > 0.55 ? '#141833' : '#E8ECFF'}" pointer-events="none">${esc(o.fmt(v))}</text>`;
+        g += `<text x="${x0 + (cw - 2) / 2}" y="${y0 + ch / 2 + 3}" text-anchor="middle" class="cell-v" fill="${t > 0.55 ? '#1A0B14' : '#F6F0F7'}" pointer-events="none">${esc(o.fmt(v))}</text>`;
     });
   });
   root.innerHTML = `<svg width="${W}" height="${H}" ${FONT} role="img">${g}</svg>`;

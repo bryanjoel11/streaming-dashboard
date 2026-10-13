@@ -1,4 +1,4 @@
-# Nightjar Subscriber Lab
+# Nightjar Insights: subscription case study
 
 A commercial product-management case study: an interactive subscription dashboard and pricing scenario lab for **Nightjar**, a streaming service. It covers subscriber growth, cohort retention, unit economics by acquisition channel and a "what if" pricing model. It ends with a one-page pricing recommendation memo written from a product manager's point of view.
 
@@ -29,7 +29,7 @@ Streaming product roles are commercial roles: pricing, packaging, retention and 
   - Outputs: 12-month projected subscribers, average churn, net revenue (subscriptions, ads, partner fees) and LTV against the baseline, monthly projection charts and the month-12 plan mix
   - A "How this model works" section with every formula and its limits
 - **Recommendation memo:** a one-page memo in Bryan's voice (context, options considered, recommendation, risks, metrics to watch). Its numbers are computed live from the same model, so they always match the lab.
-- Dark "Stellar Forge" theme (Space Grotesk, Inter and JetBrains Mono). Works at phone width, and short reveal animations are switched off under `prefers-reduced-motion`.
+- **Nightjar Insights site:** a hash-routed static site with Overview, Subscribers, Retention, Pricing Lab and Memo pages, a top nav (with a mobile menu), page headers, previous/next links and a footer. Its own brand: a crescent-and-nightjar logo mark, a near-black plum palette with one signature accent (Nightjar Rose `#FF4F8B`, 6.3:1 on the background), and Bricolage Grotesque, DM Sans and DM Mono from Google Fonts. Works at phone width, and animations are switched off under `prefers-reduced-motion`.
 
 ## Model assumptions
 
