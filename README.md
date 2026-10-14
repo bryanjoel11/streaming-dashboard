@@ -1,6 +1,6 @@
-# Duskline Insights
+# Afterglow Insights
 
-An interactive subscription dashboard and pricing lab for **Duskline**, a streaming service. It shows where subscriber growth comes from, how long subscribers stay, and what a price change would do to revenue, and it ends with a one-page pricing recommendation.
+An interactive subscription dashboard and pricing lab for **Afterglow**, a streaming service. It shows where subscriber growth comes from, how long subscribers stay, and what a price change would do to revenue, and it ends with a one-page pricing recommendation.
 
 The data covers 24 months (Oct 2024 to Sep 2026) and comes from the cohort model described below. The model runs with a fixed seed, so the numbers are reproducible.
 

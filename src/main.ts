@@ -130,7 +130,7 @@ app.innerHTML = `
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="hdr">
-    <a class="logo" href="#/overview" aria-label="Duskline Insights, overview">${logo('h')}<span class="wordmark">duskline</span><span class="logo-sub">Insights</span></a>
+    <a class="logo" href="#/overview" aria-label="Afterglow Insights, overview">${logo('h')}<span class="wordmark">afterglow</span><span class="logo-sub">Insights</span></a>
     <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav"><span class="sr">Menu</span><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     <nav id="site-nav" aria-label="Main">
       ${ROUTES.map((r) => `<a href="#/${r.id}" data-route="${r.id}">${r.label}</a>`).join('')}
@@ -144,8 +144,8 @@ app.innerHTML = `
   <section class="hero">
     <div class="wrap hero-grid">
       <div>
-        <p class="eyebrow">Duskline Insights</p>
-        <h1>Subscription health and pricing at Duskline</h1>
+        <p class="eyebrow">Afterglow Insights</p>
+        <h1>Subscription health and pricing at Afterglow</h1>
         <p class="lede">Where growth comes from, how long subscribers stay, and what a price change would really do to revenue.</p>
         <div class="cta">
           <a class="btn primary" href="#/pricing">Open the Pricing Lab</a>
@@ -290,7 +290,7 @@ app.innerHTML = `
         </fieldset>
         <fieldset><legend><label class="toggle"><input type="checkbox" id="bundleOn"><span></span>Launch a partner bundle</label></legend>
           <div class="sub" data-for="bundleOn">
-          <p class="hint">Standard + a partner music &amp; audiobook service, billed by Duskline.</p>
+          <p class="hint">Standard + a partner music &amp; audiobook service, billed by Afterglow.</p>
           ${slider('bundlePrice', 'Bundle price', 16.99, 24.99, 0.5, DEFAULT_SCENARIO.bundlePrice)}
           ${slider('bundleCost', 'Partner fee per sub', 3, 9, 0.25, DEFAULT_SCENARIO.bundleCost)}
           ${slider('bundleTake', 'Standard base that switches', 0, 0.3, 0.01, DEFAULT_SCENARIO.bundleTake)}
@@ -358,8 +358,8 @@ LTV        = month-12 net ARPU × ${MARGIN * 100}% ÷ churn (avg months 10–12)
 <footer class="site-footer">
   <div class="wrap foot-grid">
     <div class="foot-brand">
-      <a class="logo" href="#/overview" aria-label="Duskline Insights, overview">${logo('f')}<span class="wordmark">duskline</span><span class="logo-sub">Insights</span></a>
-      <p>Subscriber growth, retention and pricing for Duskline, in one place. Built by Bryan.</p>
+      <a class="logo" href="#/overview" aria-label="Afterglow Insights, overview">${logo('f')}<span class="wordmark">afterglow</span><span class="logo-sub">Insights</span></a>
+      <p>Subscriber growth, retention and pricing for Afterglow, in one place. Built by Bryan.</p>
     </div>
     <div>
       <h4>Insights</h4>
@@ -597,7 +597,7 @@ function renderMemo() {
 
   $('memo-body').innerHTML = `
   <div class="memo-meta">
-    <div><span>To</span>Head of Product &amp; Finance, Duskline</div>
+    <div><span>To</span>Head of Product &amp; Finance, Afterglow</div>
     <div><span>From</span>Bryan</div>
     <div><span>Date</span>${monthLabel(N)}</div>
     <div><span>Re</span>Pricing and packaging for the next 12 months</div>
@@ -729,7 +729,7 @@ function route() {
     else a.removeAttribute('aria-current');
   });
   const label = ROUTES.find((x) => x.id === r)!.label;
-  document.title = r === 'overview' ? 'Duskline Insights · Subscriptions and pricing' : `${label} · Duskline Insights`;
+  document.title = r === 'overview' ? 'Afterglow Insights · Subscriptions and pricing' : `${label} · Afterglow Insights`;
   menuBtn.setAttribute('aria-expanded', 'false');
   header.classList.remove('open');
   drawHistory();
