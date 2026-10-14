@@ -1,5 +1,5 @@
-/* Nightjar Insights: brand tokens.
-   Near-black plum surfaces with one signature accent, "Nightjar Rose".
+/* Moonreel Insights: brand tokens.
+   Near-black plum surfaces with one signature accent, "Moonreel Rose".
    Contrast on --bg: --text 17.5:1, --text-2 9.6:1, --muted 6.3:1, --accent 6.3:1 (all WCAG AA). */
 :root {
   --bg: #0e0a12;
@@ -330,8 +330,8 @@ section.band {
 /* ---------- KPIs ---------- */
 .kpis {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
 }
 .kpi {
   background: var(--card);
@@ -1129,9 +1129,6 @@ pre {
 
 /* ---------- responsive ---------- */
 @media (max-width: 1100px) {
-  .kpis {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
   .res-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1286,5 +1283,53 @@ pre {
   .reveal {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* ---------- simplified layout ---------- */
+.kpi {
+  padding: 20px 20px;
+}
+.kpi-value {
+  font-size: 32px;
+}
+.assumptions-box {
+  margin-top: 0;
+}
+.econ {
+  max-width: 980px;
+}
+.adv {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  margin-top: 6px;
+}
+.adv > summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-2);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.adv > summary::-webkit-details-marker {
+  display: none;
+}
+.adv > summary::after {
+  content: '+';
+  margin-left: auto;
+  font-size: 18px;
+  line-height: 1;
+}
+.adv[open] > summary::after {
+  content: '−';
+}
+.adv[open] > summary {
+  margin-bottom: 14px;
+}
+@media (max-width: 640px) {
+  .kpi-value {
+    font-size: 24px;
   }
 }

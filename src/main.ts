@@ -1,8 +1,8 @@
 import './style.css';
 import { ASSUMPTIONS, CHANNEL_IDS, CHANNELS, generate, monthLabel, PLAN_IDS, PLANS, PlanId } from './data';
 import { baselineFrom, cloneScenario, CONST, DEFAULT_SCENARIO, project, Projection, Scenario } from './model';
-import { heatmap, lineChart, shareBar, stackedBars, tipRow, wireHtmlTips } from './charts';
-import { esc, fmtCompact, fmtInt, fmtMoney, fmtPct, fmtPrice, pts, signed } from './format';
+import { heatmap, lineChart, tipRow, wireHtmlTips } from './charts';
+import { esc, fmtCompact, fmtMoney, fmtPct, fmtPrice, pts, signed } from './format';
 
 // ---------------------------------------------------------------- data
 const COLORS: Record<PlanId | 'bundle' | 'total' | 'accent', string> = {
@@ -54,26 +54,18 @@ const yoyMrr = revenue(L) / revenue(Y) - 1;
 const dChurn = churnRate(L) - churnRate(Y);
 const ratio = ltv(L) / cac(L);
 const ratioY = ltv(Y) / cac(Y);
-const payback = cac(L) / (arpu(L) * MARGIN);
-const paybackY = cac(Y) / (arpu(Y) * MARGIN);
 const vsY = 'YoY';
 
 const kpis = [
   kpi('Subscribers', fmtCompact(totSubs(L)), `${signed(yoySubs, (x) => fmtPct(x))} ${vsY}`, yoySubs > 0, 'Paying, end of month'),
   kpi('MRR', fmtMoney(revenue(L)), `${signed(yoyMrr, (x) => fmtPct(x))} ${vsY}`, yoyMrr > 0, `ARR ${fmtMoney(revenue(L) * 12)} · fees + ads`),
-  kpi('ARPU', fmtPrice(arpu(L)), `${signed(arpu(L) - arpu(Y), fmtPrice)} ${vsY}`, arpu(L) > arpu(Y), 'MRR ÷ subscribers'),
   kpi('Monthly churn', fmtPct(churnRate(L), 2), `${signed(dChurn, (x) => pts(x))} ${vsY}`, dChurn < 0, 'Cancels ÷ opening subs'),
-  kpi('LTV', fmtPrice(ltv(L)).replace(/\.\d+$/, ''), `${signed(ltv(L) - ltv(Y), (x) => fmtPrice(x).replace(/\.\d+$/, ''))} ${vsY}`, ltv(L) > ltv(Y), `ARPU × ${MARGIN * 100}% ÷ churn`),
   kpi('LTV : CAC', `${ratio.toFixed(1)}×`, `${signed(ratio - ratioY, (x) => x.toFixed(1) + '×')} ${vsY}`, ratio > ratioY, `Blended CAC ${fmtPrice(cac(L))}`),
-  kpi('CAC payback', `${payback.toFixed(1)} mo`, `${signed(payback - paybackY, (x) => x.toFixed(1) + ' mo')} ${vsY}`, payback < paybackY, 'CAC ÷ monthly contribution'),
 ];
 
 // ---------------- insights computed from the data
-const basicShareSubs = L.subs.basic / totSubs(L);
-const basicShareRev = (L.subRevenue.basic + L.adRevenue) / revenue(L);
 const adArpu12 = M.slice(-12).reduce((a, r) => a + r.adArpu, 0) / 12;
 const basicValue12 = L.price.basic + adArpu12;
-const grossMixBasicY0 = M[0].signups.basic / gross(M[0]);
 const grossMixBasicL = M.slice(-3).reduce((a, r) => a + r.signups.basic, 0) / M.slice(-3).reduce((a, r) => a + gross(r), 0);
 const stdPreChurn = M.slice(9, 12).reduce((a, r) => a + r.churned.standard / r.startSubs.standard, 0) / 3;
 const stdShock = M[12].churned.standard / M[12].startSubs.standard;
@@ -90,8 +82,6 @@ const partner = ch.find((c) => c.id === 'partner')!;
 
 // Holiday vs. non-holiday cohort M3 retention
 const ret3 = (i: number) => ds.cohortRetention[i][2] ?? 0;
-const decCohort = ret3(2);
-const marCohort = ret3(5);
 const onboardBefore = [3, 4, 5, 6, 7, 8].reduce((a, i) => a + ret3(i), 0) / 6;
 const onboardAfter = [15, 16, 17, 18, 19, 20].reduce((a, i) => a + ret3(i), 0) / 6;
 
@@ -105,11 +95,11 @@ const ROUTES = [
 ] as const;
 type RouteId = (typeof ROUTES)[number]['id'];
 
-// Logo mark: a crescent moon with a nightjar gliding through its hollow.
+// Logo mark: a crescent moon with a play button in its hollow.
 const logo = (k: string) => `<svg class="mark" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true">
   <defs><mask id="nj-crescent-${k}"><rect width="40" height="40" fill="#fff"/><circle cx="26.5" cy="13" r="13" fill="#000"/></mask></defs>
   <circle cx="18" cy="21.5" r="16" fill="#FF4F8B" mask="url(#nj-crescent-${k})"/>
-  <path d="M15.5 17.2c3.2-3.9 6.6-4.6 9.6-1.9 1.6-3.6 5.4-6 10.4-5.6-3.6 1-6.4 3-8.2 5.9-.9 1.4-2.4 1.9-3.6 1.1-2.4-1.5-5-1.4-8.2.5Z" fill="#F6F0F7"/>
+  <path d="M23 14.5v9.5l8-4.75z" fill="#F6F0F7"/>
 </svg>`;
 
 const HERO_ART = `<svg viewBox="0 0 420 320" width="100%" height="100%">
@@ -119,7 +109,7 @@ const HERO_ART = `<svg viewBox="0 0 420 320" width="100%" height="100%">
   </defs>
   <circle cx="210" cy="160" r="160" fill="url(#glow)"/>
   <circle cx="200" cy="168" r="118" fill="#FF4F8B" mask="url(#hero-crescent)"/>
-  <path d="M168 128c24-29 50-34 72-14 12-27 40-45 78-42-27 8-48 22-61 44-7 10-18 14-27 8-18-11-37-10-62 4Z" fill="#F6F0F7"/>
+  <path d="M262 88v62l52-31z" fill="#F6F0F7"/>
   <g fill="#F6F0F7" opacity=".7"><circle cx="70" cy="60" r="1.6"/><circle cx="352" cy="232" r="1.4"/><circle cx="96" cy="250" r="1.2"/><circle cx="372" cy="70" r="1.8"/><circle cx="320" cy="290" r="1.1"/><circle cx="40" cy="170" r="1.3"/></g>
 </svg>`;
 
@@ -140,7 +130,7 @@ app.innerHTML = `
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="hdr">
-    <a class="logo" href="#/overview" aria-label="Nightjar Insights, overview">${logo('h')}<span class="wordmark">nightjar</span><span class="logo-sub">Insights</span></a>
+    <a class="logo" href="#/overview" aria-label="Moonreel Insights, overview">${logo('h')}<span class="wordmark">moonreel</span><span class="logo-sub">Insights</span></a>
     <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav"><span class="sr">Menu</span><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     <nav id="site-nav" aria-label="Main">
       ${ROUTES.map((r) => `<a href="#/${r.id}" data-route="${r.id}">${r.label}</a>`).join('')}
@@ -154,9 +144,9 @@ app.innerHTML = `
   <section class="hero">
     <div class="wrap hero-grid">
       <div>
-        <p class="eyebrow">Nightjar Insights · Case study</p>
-        <h1>Subscription health and pricing at Nightjar</h1>
-        <p class="lede">A commercial product-management case study by Bryan. It covers ${ASSUMPTIONS.months} months of Nightjar's subscription business (${ASSUMPTIONS.startLabel} to ${L.label}): where growth comes from, what it costs to buy, how long it stays, and what a price change would really do to revenue.</p>
+        <p class="eyebrow">Moonreel Insights</p>
+        <h1>Subscription health and pricing at Moonreel</h1>
+        <p class="lede">Where growth comes from, how long subscribers stay, and what a price change would really do to revenue.</p>
         <div class="cta">
           <a class="btn primary" href="#/pricing">Open the Pricing Lab</a>
           <a class="btn ghost" href="#/memo">Read the pricing memo</a>
@@ -168,7 +158,7 @@ app.innerHTML = `
 
   <section class="band">
     <div class="wrap">
-      <div class="sec-head"><h2>Where we are, ${L.label}</h2><p>Month-end snapshot. Changes are year over year, against ${Y.label}.</p></div>
+      <div class="sec-head"><h2>Where we are, ${L.label}</h2><p>Changes are year over year.</p></div>
       <div class="kpis">${kpis.join('')}</div>
     </div>
   </section>
@@ -191,8 +181,9 @@ app.innerHTML = `
 
   <section id="assumptions">
     <div class="wrap narrow">
-      <div class="sec-head"><h2>Model assumptions</h2><p>The inputs behind every figure in this case study. The pricing model's own rules are on the <a href="#/pricing/how">Pricing Lab</a> page.</p></div>
-      <div class="card assumptions">
+      <details class="how card assumptions-box">
+      <summary><span>How the numbers are built</span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2"/></svg></summary>
+      <div class="how-body assumptions">
       <ul>
         <li><strong>Plans:</strong> Basic with ads $7.99 · Standard (ad-free) $14.99, raised to $15.99 in Oct 2025 · Premium (4K, 4 streams) $21.99. No plan switching in the history.</li>
         <li><strong>Starting base:</strong> ${fmtCompact(ASSUMPTIONS.legacyBase.basic)} Basic, ${fmtCompact(ASSUMPTIONS.legacyBase.standard)} Standard, ${fmtCompact(ASSUMPTIONS.legacyBase.premium)} Premium long-tenured subscribers churning at ${PLAN_IDS.map((p) => fmtPct(ASSUMPTIONS.legacyChurn[p])).join(' / ')} a month, plus a hidden ${ASSUMPTIONS.burnIn}-month warm-up before Oct 2024 so the base starts with a realistic mix of new and tenured subscribers.</li>
@@ -204,13 +195,14 @@ app.innerHTML = `
         <li><strong>Data model:</strong> the monthly figures come from the cohort model these assumptions describe, run with a fixed random seed so every number is reproducible.</li>
       </ul>
       </div>
+      </details>
     </div>
   </section>
   ${pager('overview')}
 </div>
 
 <div class="view" data-view="subscribers" hidden>
-  ${pageHeader('Subscribers', 'Growth is shifting to the ad tier, and that is fine', `<p class="ph-lede">Basic with ads is ${fmtPct(basicShareSubs, 0)} of subscribers but ${fmtPct(basicShareRev, 0)} of revenue. Over the last 12 months ads averaged ${fmtPrice(adArpu12)} per Basic subscriber, so one is worth about <strong>${fmtPrice(basicValue12)} a month</strong>, ${fmtPct(basicValue12 / L.price.standard, 0)} of a Standard subscriber.</p>`)}
+  ${pageHeader('Subscribers', 'Growth is shifting to the ad tier, and that is fine', `<p class="ph-lede">With ads, a Basic subscriber is worth about <strong>${fmtPrice(basicValue12)} a month</strong>, ${fmtPct(basicValue12 / L.price.standard, 0)} of a Standard subscriber.</p>`)}
   <section>
     <div class="wrap">
     <div class="grid2">
@@ -218,40 +210,12 @@ app.innerHTML = `
         <header><h3>Subscribers by plan</h3><p>Month-end paying subscribers</p></header>
         ${legend(PLAN_IDS.map((p) => ({ name: PLANS[p].short, color: COLORS[p] })))}
         <div class="chart" id="c-subs"></div>
-        ${dataTable(['Month', ...PLAN_IDS.map((p) => PLANS[p].short), 'Total'], M.map((r) => [r.label, ...PLAN_IDS.map((p) => fmtInt(r.subs[p])), fmtInt(totSubs(r))]))}
-      </article>
-      <article class="card reveal">
-        <header><h3>MRR by plan</h3><p>Subscription fees plus Basic ad revenue (hatched)</p></header>
-        ${legend([
-          { name: 'Basic fees', color: COLORS.basic },
-          { name: 'Basic ads', color: COLORS.basic, pattern: true },
-          { name: 'Standard', color: COLORS.standard },
-          { name: 'Premium', color: COLORS.premium },
-        ])}
-        <div class="chart" id="c-mrr"></div>
-        ${dataTable(['Month', 'Basic fees', 'Basic ads', 'Standard', 'Premium', 'Total'], M.map((r) => [r.label, fmtMoney(r.subRevenue.basic), fmtMoney(r.adRevenue), fmtMoney(r.subRevenue.standard), fmtMoney(r.subRevenue.premium), fmtMoney(revenue(r))]))}
-      </article>
-      <article class="card reveal">
-        <header><h3>Plan mix</h3><p>Share of subscribers, signups and revenue</p></header>
-        ${legend([
-          { name: 'Basic', color: COLORS.basic },
-          { name: 'Standard', color: COLORS.standard },
-          { name: 'Premium', color: COLORS.premium },
-        ])}
-        <div class="mix" id="c-mix">
-          ${mixRow(`Subscribers, ${Y.label}`, PLAN_IDS.map((p) => Y.subs[p]), fmtCompact)}
-          ${mixRow(`Subscribers, ${L.label}`, PLAN_IDS.map((p) => L.subs[p]), fmtCompact)}
-          ${mixRow('Signups, last 3 months', PLAN_IDS.map((p) => M.slice(-3).reduce((a, r) => a + r.signups[p], 0)), fmtCompact)}
-          ${mixRow(`Revenue incl. ads, ${L.label}`, [L.subRevenue.basic + L.adRevenue, L.subRevenue.standard, L.subRevenue.premium], (v) => fmtMoney(v))}
-        </div>
-        <p class="note">Basic went from ${fmtPct(grossMixBasicY0, 0)} to ${fmtPct(grossMixBasicL, 0)} of signups. The ad tier is our cheapest way in and our safety net when people trade down instead of cancelling.</p>
       </article>
       <article class="card reveal">
         <header><h3>Monthly churn</h3><p>Cancels ÷ subscribers at the start of the month</p></header>
         ${legend([...PLAN_IDS.map((p) => ({ name: PLANS[p].short, color: COLORS[p] })), { name: 'Blended', color: COLORS.total, dash: true }])}
         <div class="chart" id="c-churn"></div>
-        <p class="note">The Oct 2025 Standard increase is our elasticity read: Standard churn went from ${fmtPct(stdPreChurn)} to ${fmtPct(stdShock)} in the renewal month, then settled around ${fmtPct(stdAfter)}. Blended churn stays stubborn because the mix keeps moving to Basic, which churns about twice as fast as Standard.</p>
-        ${dataTable(['Month', ...PLAN_IDS.map((p) => PLANS[p].short), 'Blended'], M.map((r) => [r.label, ...PLAN_IDS.map((p) => fmtPct(r.churned[p] / r.startSubs[p], 2)), fmtPct(churnRate(r), 2)]))}
+        <p class="note">The Oct 2025 Standard increase is our elasticity read: Standard churn went from ${fmtPct(stdPreChurn)} to ${fmtPct(stdShock)} in the renewal month, then settled around ${fmtPct(stdAfter)}.</p>
       </article>
     </div>
 
@@ -261,14 +225,13 @@ app.innerHTML = `
 </div>
 
 <div class="view" data-view="retention" hidden>
-  ${pageHeader('Retention', 'Cohorts: who we keep, and when we lose them', `<p class="ph-lede">Each row is a signup month; each cell is the share of that month's signups still paying N months later. Half of a cohort is gone by month 10. Holiday cohorts are the weakest (Dec 2024 kept ${fmtPct(decCohort, 0)} at month 3 vs ${fmtPct(marCohort, 0)} for Mar 2025). The Jan 2026 onboarding change lifted month-3 retention from ${fmtPct(onboardBefore, 0)} to ${fmtPct(onboardAfter, 0)}.</p>`)}
+  ${pageHeader('Retention', 'Cohorts: who we keep, and when we lose them', `<p class="ph-lede">Each row is a signup month, and each cell is the share still paying N months later. The Jan 2026 onboarding change lifted month-3 retention from ${fmtPct(onboardBefore, 0)} to ${fmtPct(onboardAfter, 0)}.</p>`)}
   <section>
     <div class="wrap">
     <article class="card reveal">
       <header><h3>Cohort retention</h3><p>Signup month × months since signup, all plans and channels</p></header>
       <div class="heat-legend"><span>Lower</span><span class="ramp" aria-hidden="true"></span><span>Higher retention</span></div>
       <div class="chart" id="c-heat"></div>
-      ${dataTable(['Cohort', ...Array.from({ length: 12 }, (_, k) => `M${k + 1}`)], ds.cohortRetention.slice(0, N - 1).map((row, i) => [M[i].label, ...row.map((v) => (v == null ? '' : fmtPct(v, 0)))]))}
     </article>
 
     </div>
@@ -276,13 +239,7 @@ app.innerHTML = `
   <section class="band">
     <div class="wrap">
       <div class="sec-head"><h2>What a subscriber is worth vs. what it costs to win one</h2><p class="sub-lede">Blended LTV:CAC is ${ratio.toFixed(1)}×, but the blend hides a split. ${esc(social.name)} is our biggest paid channel and sits at <strong>${social.ratio.toFixed(1)}×</strong>, below the 3× rule of thumb, while ${esc(partner.name.toLowerCase())} return <strong>${partner.ratio.toFixed(1)}×</strong>.</p></div>
-    <div class="grid2 econ">
-      <article class="card reveal">
-        <header><h3>Customer acquisition cost by channel</h3><p>Spend ÷ signups, monthly</p></header>
-        ${legend([{ name: 'Blended CAC', color: COLORS.total }, { name: 'Paid social', color: COLORS.standard }, { name: 'Paid search', color: COLORS.premium }, { name: 'Partners', color: COLORS.basic }])}
-        <div class="chart" id="c-cac"></div>
-        <p class="note">Paid social CAC is up ${fmtPct(L.cacByChannel.social / M[0].cacByChannel.social - 1, 0)} in two years as auction prices climb.</p>
-      </article>
+    <div class="econ">
       <article class="card reveal">
         <header><h3>LTV : CAC by channel</h3><p>All 24 months of signups. Churn from cohorts with 12 months of history.</p></header>
         <div class="table-wrap"><table class="econ-table">
@@ -304,7 +261,7 @@ app.innerHTML = `
 </div>
 
 <div class="view" data-view="pricing" hidden>
-  ${pageHeader('Pricing Lab', 'What would a price change really do?', `<p class="ph-lede">Move a lever and see the projected 12 months from ${monthLabel(N)} against a do-nothing baseline. The model is intentionally simple: every rule is written out below so the numbers can be challenged.</p>`)}
+  ${pageHeader('Pricing Lab', 'What would a price change really do?', `<p class="ph-lede">Pick a scenario or move a price, and see the next 12 months against doing nothing.</p>`)}
   <section class="lab-section">
     <div class="wrap">
     <div class="presets" role="group" aria-label="Scenario presets">
@@ -320,6 +277,7 @@ app.innerHTML = `
         <fieldset><legend>Price change per plan</legend>
           ${PLAN_IDS.map((p) => slider(`d-${p}`, `${PLANS[p].short} <small>now ${fmtPrice(L.price[p])}</small>`, -3, 4, 0.5, 0)).join('')}
         </fieldset>
+        <details class="adv"><summary>Advanced settings</summary>
         <fieldset><legend>Customer response</legend>
           ${slider('elasticity', 'Price elasticity <small>calibrated 1.2</small>', 0, 3, 0.1, DEFAULT_SCENARIO.elasticity)}
           ${slider('downgrade', 'Trade-down capture <small>leavers who drop a tier</small>', 0, 0.6, 0.05, DEFAULT_SCENARIO.downgrade)}
@@ -332,13 +290,14 @@ app.innerHTML = `
         </fieldset>
         <fieldset><legend><label class="toggle"><input type="checkbox" id="bundleOn"><span></span>Launch a partner bundle</label></legend>
           <div class="sub" data-for="bundleOn">
-          <p class="hint">Standard + a partner music &amp; audiobook service, billed by Nightjar.</p>
+          <p class="hint">Standard + a partner music &amp; audiobook service, billed by Moonreel.</p>
           ${slider('bundlePrice', 'Bundle price', 16.99, 24.99, 0.5, DEFAULT_SCENARIO.bundlePrice)}
           ${slider('bundleCost', 'Partner fee per sub', 3, 9, 0.25, DEFAULT_SCENARIO.bundleCost)}
           ${slider('bundleTake', 'Standard base that switches', 0, 0.3, 0.01, DEFAULT_SCENARIO.bundleTake)}
           ${slider('bundleChurnCut', 'Churn reduction for bundlers', 0, 0.5, 0.05, DEFAULT_SCENARIO.bundleChurnCut)}
           </div>
         </fieldset>
+        </details>
       </form>
       <div class="results">
         <div class="res-cards" id="res-cards" aria-live="polite"></div>
@@ -347,12 +306,6 @@ app.innerHTML = `
           ${legend([{ name: 'Scenario', color: COLORS.accent }, { name: 'Baseline', color: COLORS.total, dash: true }])}
           <div class="chart" id="c-proj-rev"></div>
         </div>
-        <div class="card">
-          <header><h3>Subscribers</h3><p>Month-end, all plans</p></header>
-          ${legend([{ name: 'Scenario', color: COLORS.accent }, { name: 'Baseline', color: COLORS.total, dash: true }])}
-          <div class="chart" id="c-proj-subs"></div>
-        </div>
-        <div class="card" id="plan-table"></div>
       </div>
     </div>
     <details class="how card" id="how">
@@ -405,25 +358,16 @@ LTV        = month-12 net ARPU × ${MARGIN * 100}% ÷ churn (avg months 10–12)
 <footer class="site-footer">
   <div class="wrap foot-grid">
     <div class="foot-brand">
-      <a class="logo" href="#/overview" aria-label="Nightjar Insights, overview">${logo('f')}<span class="wordmark">nightjar</span><span class="logo-sub">Insights</span></a>
-      <p>Nightjar Insights is a commercial product-management case study by Bryan: subscription KPIs, retention, unit economics and a pricing model, ending in a recommendation.</p>
+      <a class="logo" href="#/overview" aria-label="Moonreel Insights, overview">${logo('f')}<span class="wordmark">moonreel</span><span class="logo-sub">Insights</span></a>
+      <p>Subscriber growth, retention and pricing for Moonreel, in one place. Built by Bryan.</p>
     </div>
     <div>
       <h4>Insights</h4>
       <ul>${ROUTES.map((r) => `<li><a href="#/${r.id}">${r.label}</a></li>`).join('')}</ul>
     </div>
-    <div>
-      <h4>Method</h4>
-      <ul>
-        <li><a href="#/overview/assumptions">Model assumptions</a></li>
-        <li><a href="#/pricing/how">How the pricing model works</a></li>
-        <li><a href="#/subscribers">Data tables under each chart</a></li>
-      </ul>
-    </div>
   </div>
   <div class="wrap foot-base">
-    <span>Case study by Bryan · ${ASSUMPTIONS.startLabel} to ${L.label}</span>
-    <span>Figures come from the model described under Model assumptions.</span>
+    <span>Built by Bryan · ${ASSUMPTIONS.startLabel} to ${L.label}</span>
   </div>
 </footer>
 `;
@@ -433,19 +377,6 @@ function legend(items: { name: string; color: string; pattern?: boolean; dash?: 
   return `<div class="legend">${items
     .map((i) => `<span><i class="sw${i.pattern ? ' sw-hatch' : ''}${i.dash ? ' sw-dash' : ''}" style="--c:${i.color}"></i>${esc(i.name)}</span>`)
     .join('')}</div>`;
-}
-
-function mixRow(label: string, vals: number[], fmt: (v: number) => string) {
-  return `<div class="mix-row"><div class="mix-label">${esc(label)}</div>${shareBar(
-    PLAN_IDS.map((p, i) => ({ name: PLANS[p].short, color: COLORS[p], value: vals[i] })),
-    fmt,
-  )}</div>`;
-}
-
-function dataTable(head: string[], rows: string[][]) {
-  return `<details class="data"><summary>Show data table</summary><div class="table-wrap"><table><thead><tr>${head
-    .map((h) => `<th>${esc(h)}</th>`)
-    .join('')}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c, i) => (i ? `<td>${esc(c)}</td>` : `<th scope="row">${esc(c)}</th>`)).join('')}</tr>`).join('')}</tbody></table></div></details>`;
 }
 
 function slider(id: string, label: string, min: number, max: number, step: number, value: number) {
@@ -475,19 +406,6 @@ function drawHistory() {
     annotations: [{ i: ASSUMPTIONS.standardIncreaseMonth, text: 'Standard +$1' }],
     tipExtra: (i) => tipRow(null, 'Total', fmtCompact(totSubs(M[i]))) + tipRow(null, 'Signups', fmtCompact(gross(M[i]))),
   });
-  stackedBars(document.getElementById('c-mrr')!, {
-    labels,
-    shortLabels: short,
-    series: [
-      { name: 'Basic fees', color: COLORS.basic, values: M.map((r) => r.subRevenue.basic) },
-      { name: 'Basic ads', color: COLORS.basic, values: M.map((r) => r.adRevenue), pattern: true },
-      { name: 'Standard', color: COLORS.standard, values: M.map((r) => r.subRevenue.standard) },
-      { name: 'Premium', color: COLORS.premium, values: M.map((r) => r.subRevenue.premium) },
-    ],
-    yFmt: (v) => fmtMoney(v),
-    axisFmt: moneyAxis,
-    totalLabel: 'MRR',
-  });
   lineChart(document.getElementById('c-churn')!, {
     labels,
     shortLabels: short,
@@ -508,18 +426,6 @@ function drawHistory() {
     fmt: (v) => Math.round(v * 100).toString(),
     tip: (r, c, v) =>
       `<div class="tip-t">${esc(M[r].label)} cohort</div>${tipRow(null, `Retained at month ${c + 1}`, fmtPct(v, 1))}${tipRow(null, 'Signups', fmtCompact(gross(M[r])))}`,
-  });
-  lineChart(document.getElementById('c-cac')!, {
-    labels,
-    shortLabels: short,
-    series: [
-      { name: 'Blended', color: COLORS.total, values: M.map(cac) },
-      { name: 'Paid social', color: COLORS.standard, values: M.map((r) => r.cacByChannel.social) },
-      { name: 'Paid search', color: COLORS.premium, values: M.map((r) => r.cacByChannel.search) },
-      { name: 'Partners', color: COLORS.basic, values: M.map((r) => r.cacByChannel.partner) },
-    ],
-    yFmt: (v) => `$${v.toFixed(0)}`,
-    yMin: 0,
   });
 }
 
@@ -570,6 +476,7 @@ function syncControls() {
   }
   $<HTMLInputElement>('promoOn').checked = scen.promoOn;
   $<HTMLInputElement>('bundleOn').checked = scen.bundleOn;
+  if (scen.promoOn || scen.bundleOn) document.querySelector<HTMLDetailsElement>('.adv')!.open = true;
   document.querySelectorAll<HTMLElement>('.sub').forEach((el) => {
     const on = $<HTMLInputElement>(el.dataset.for!).checked;
     el.classList.toggle('off', !on);
@@ -623,36 +530,7 @@ function renderWhatIf() {
     height: 210,
     tipExtra: (i) => tipRow(null, 'Difference', signed(p.months[i].net - b.months[i].net, (x) => fmtMoney(x))),
   });
-  lineChart($('c-proj-subs'), {
-    labels: pl,
-    shortLabels: ps,
-    series: [
-      { name: 'Scenario', color: COLORS.accent, values: p.months.map((x) => x.total) },
-      { name: 'Baseline', color: COLORS.total, values: b.months.map((x) => x.total), dash: true },
-    ],
-    yFmt: (v) => fmtCompact(v),
-    height: 210,
-    tipExtra: (i) => tipRow(null, 'Difference', signed(p.months[i].total - b.months[i].total, (x) => fmtCompact(x))),
-  });
 
-  const pe = p.months[11].subs;
-  const be = b.months[11].subs;
-  const rows: { name: string; color: string; hatch?: boolean; s: number; b: number }[] = [
-    { name: 'Basic with ads', color: COLORS.basic, s: pe.basic, b: be.basic },
-    ...(pe.promo > 0 ? [{ name: 'Basic (promo cohorts)', color: COLORS.basic, hatch: true, s: pe.promo, b: 0 }] : []),
-    { name: 'Standard', color: COLORS.standard, s: pe.standard, b: be.standard },
-    { name: 'Premium', color: COLORS.premium, s: pe.premium, b: be.premium },
-    ...(pe.bundle > 0 ? [{ name: 'Bundle', color: COLORS.bundle, hatch: true, s: pe.bundle, b: 0 }] : []),
-  ];
-  $('plan-table').innerHTML = `<header><h3>Plan mix at month 12</h3><p>Where subscribers end up</p></header>
-  <div class="table-wrap"><table class="plan-t"><thead><tr><th>Plan</th><th>Scenario</th><th>Baseline</th><th>Change</th></tr></thead><tbody>
-  ${rows
-    .map(
-      (r) =>
-        `<tr><th scope="row"><i class="sw${r.hatch ? ' sw-hatch' : ''}" style="--c:${r.color}"></i>${esc(r.name)}</th><td>${fmtCompact(r.s)}</td><td>${fmtCompact(r.b)}</td><td>${signed(r.s - r.b, (x) => fmtCompact(x))}</td></tr>`,
-    )
-    .join('')}
-  </tbody></table></div>`;
 
   document.querySelectorAll<HTMLButtonElement>('.presets button').forEach((btn) => {
     const s = PRESETS[btn.dataset.preset!]();
@@ -719,7 +597,7 @@ function renderMemo() {
 
   $('memo-body').innerHTML = `
   <div class="memo-meta">
-    <div><span>To</span>Head of Product &amp; Finance, Nightjar</div>
+    <div><span>To</span>Head of Product &amp; Finance, Moonreel</div>
     <div><span>From</span>Bryan</div>
     <div><span>Date</span>${monthLabel(N)}</div>
     <div><span>Re</span>Pricing and packaging for the next 12 months</div>
@@ -769,7 +647,7 @@ function renderMemo() {
     <li>LTV:CAC and payback by channel, monthly</li>
   </ul>
   <p class="sign">Bryan</p>
-  <p class="memo-note">All figures come from the case-study data and the scenario model above. Click “My recommendation” in the lab to inspect them.</p>`;
+  <p class="memo-note">All figures come from the dashboard data and the Pricing Lab model. Click “My recommendation” in the lab to inspect them.</p>`;
 }
 
 // ---------------------------------------------------------------- overview highlights
@@ -851,7 +729,7 @@ function route() {
     else a.removeAttribute('aria-current');
   });
   const label = ROUTES.find((x) => x.id === r)!.label;
-  document.title = r === 'overview' ? 'Nightjar Insights · Subscription case study' : `${label} · Nightjar Insights`;
+  document.title = r === 'overview' ? 'Moonreel Insights · Subscriptions and pricing' : `${label} · Moonreel Insights`;
   menuBtn.setAttribute('aria-expanded', 'false');
   header.classList.remove('open');
   drawHistory();

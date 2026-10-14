@@ -1,35 +1,18 @@
-# Nightjar Insights: subscription case study
+# Moonreel Insights
 
-A commercial product-management case study: an interactive subscription dashboard and pricing scenario lab for **Nightjar**, a streaming service. It covers subscriber growth, cohort retention, unit economics by acquisition channel and a "what if" pricing model. It ends with a one-page pricing recommendation memo written from a product manager's point of view.
+An interactive subscription dashboard and pricing lab for **Moonreel**, a streaming service. It shows where subscriber growth comes from, how long subscribers stay, and what a price change would do to revenue, and it ends with a one-page pricing recommendation.
 
-> The case study covers 24 months (Oct 2024 to Sep 2026). Every figure comes from the cohort model described below and in the page's **Model assumptions** panel. The model runs with a fixed seed, so the numbers are reproducible.
+The data covers 24 months (Oct 2024 to Sep 2026) and comes from the cohort model described below. The model runs with a fixed seed, so the numbers are reproducible.
 
-## Why it matters (for a hiring manager)
+## Pages
 
-Streaming product roles are commercial roles: pricing, packaging, retention and acquisition efficiency decide whether a subscriber is worth having. This project shows that thinking end to end:
+- **Overview:** four KPIs (subscribers, MRR, monthly churn, LTV:CAC) and a short read of the business.
+- **Subscribers:** subscribers by plan, annotated with the Oct 2025 price increase, and monthly churn by plan.
+- **Retention:** a cohort retention heatmap and LTV:CAC by acquisition channel.
+- **Pricing Lab:** presets and a price slider per plan, with customer response, promo and bundle levers under Advanced settings. It shows 12 months of revenue, churn and LTV against doing nothing.
+- **Memo:** a one-page recommendation whose numbers are computed live from the same model.
 
-- **Reading the business, not just charting it.** Every chart carries a "so what" line: the ad tier is ~37% of subscribers but a Basic subscriber with ads is worth ~85% of an ad-free one; paid social has fallen below a 3× LTV:CAC; holiday cohorts retain worst.
-- **Calibrating from evidence.** The default price elasticity (1.2) comes from the service's own past price increase, visible in the churn chart.
-- **Trading off options honestly.** The memo compares a blanket +$2 increase, an intro promo, a bundle and a combined package, shows the downside cases (higher elasticity, worse partner terms), and names the metrics and kill-switch to watch.
-- **An explainable model.** The formulas are on the page, so a finance partner can challenge any number.
-
-## Features
-
-- **KPI row:** subscribers, MRR/ARR, ARPU (ads included), monthly churn, LTV, LTV:CAC and CAC payback, each with a year-over-year change.
-- **Charts** (hand-rolled SVG, with hover tooltips and a data table for each):
-  - Subscribers by plan, annotated with the Oct 2025 price increase
-  - MRR stacked by plan, with ad revenue shown separately (hatched)
-  - Monthly churn by plan and blended
-  - Plan mix: subscribers, signups and revenue share
-  - Cohort retention heatmap (signup month × months since signup)
-  - CAC by channel over time, plus an LTV:CAC and payback table by channel
-- **Pricing scenario lab:**
-  - Levers: price change per plan, price elasticity, trade-down capture, an ad-tier intro promo (price and length) and a partner bundle launch (price, partner fee, switching rate, churn reduction)
-  - Presets: Baseline, Ad-free +$2, Ad-tier promo, Bundle launch, My recommendation
-  - Outputs: 12-month projected subscribers, average churn, net revenue (subscriptions, ads, partner fees) and LTV against the baseline, monthly projection charts and the month-12 plan mix
-  - A "How this model works" section with every formula and its limits
-- **Recommendation memo:** a one-page memo in Bryan's voice (context, options considered, recommendation, risks, metrics to watch). Its numbers are computed live from the same model, so they always match the lab.
-- **Nightjar Insights site:** a hash-routed static site with Overview, Subscribers, Retention, Pricing Lab and Memo pages, a top nav (with a mobile menu), page headers, previous/next links and a footer. Its own brand: a crescent-and-nightjar logo mark, a near-black plum palette with one signature accent (Nightjar Rose `#FF4F8B`, 6.3:1 on the background), and Bricolage Grotesque, DM Sans and DM Mono from Google Fonts. Works at phone width, and animations are switched off under `prefers-reduced-motion`.
+The site has its own brand (a crescent-and-play logo mark, a near-black plum palette with one rose accent), works at phone width, and switches animations off under `prefers-reduced-motion`.
 
 ## Model assumptions
 
