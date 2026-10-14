@@ -1,4 +1,4 @@
-// Data model for the Moonreel streaming dashboard.
+// Data model for the Duskline streaming dashboard.
 // Everything here is deterministic: a seeded PRNG drives all noise, so the
 // dashboard shows the same numbers on every load.
 
